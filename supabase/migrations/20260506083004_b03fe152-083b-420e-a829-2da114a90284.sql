@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.telegram_upsert_player(BIGINT, TEXT, TEXT, TEXT, TEXT) FROM PUBLIC, anon, authenticated;
