@@ -4,7 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // base: '/your-repo-name/', // ← раскомментируй и замени если деплоишь на GitHub Pages под именем репо
+  base: "/pingtablet/",
   server: {
     host: "::",
     port: 8080,
