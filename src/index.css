@@ -59,38 +59,6 @@
     --shadow-glow: 0 0 0 1px hsl(16 79% 54% / 0.35), 0 8px 30px -6px hsl(16 79% 54% / 0.4);
     --gradient-orange: linear-gradient(135deg, #e8572a 0%, #f2763f 100%);
   }
-
-  /* Keep dark mode for system dark users */
-  .dark {
-    --background: 220 15% 8%;
-    --foreground: 220 10% 92%;
-    --card: 220 14% 12% / 0.72;
-    --card-foreground: 220 10% 92%;
-    --popover: 220 14% 14% / 0.92;
-    --popover-foreground: 220 10% 92%;
-    --primary: 16 79% 54%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 16%;
-    --secondary-foreground: 220 10% 80%;
-    --muted: 220 14% 16%;
-    --muted-foreground: 220 10% 52%;
-    --accent: 16 79% 54%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 75% 55%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 14% 20%;
-    --input: 220 14% 18%;
-    --ring: 16 79% 54%;
-    --ink: 220 10% 92%;
-    --paper: 220 15% 8%;
-    --hairline: 220 14% 20%;
-    --subtle: 220 10% 50%;
-    --glass-bg: rgba(30, 32, 40, 0.72);
-    --glass-bg-heavy: rgba(30, 32, 40, 0.88);
-    --glass-border: rgba(255,255,255,0.10);
-    --glass-shadow: 0 8px 32px -8px rgba(0,0,0,0.4), 0 2px 8px -2px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
-    --shadow-soft: 0 2px 12px -4px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25);
-  }
 }
 
 @layer base {
@@ -112,6 +80,7 @@
   }
   @media (min-width: 640px) { html { font-size: 16px; } }
 
+  html { color-scheme: light; }
   body {
     @apply font-sans;
     /* iOS 27 – layered gradient background */
