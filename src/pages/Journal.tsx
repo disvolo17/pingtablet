@@ -136,19 +136,26 @@ export default function Journal() {
 
   const buyPack = async () => {
     if (busy) return;
+    if (!me) { toast.error("Войди чтобы открывать паки"); return; }
     setBusy(true);
-    const { data, error } = await supabase.rpc("sticker_buy_pack");
+    try {
+      const { data, error } = await supabase.rpc("sticker_buy_pack");
+      if (error) { toast.error(error.message); setBusy(false); return; }
+      if (owner) await reloadCollection(owner.id);
+      const items = (data as unknown as StickerInventoryRow[]) ?? [];
+      if (items.length === 0) { toast.error("Пак пуст — попробуй позже"); setBusy(false); return; }
+      setOpening(items);
+      setRevealed(0);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Ошибка");
+    }
     setBusy(false);
-    if (error) { toast.error(error.message); return; }
-    if (owner) await reloadCollection(owner.id);
-    setOpening((data as unknown as StickerInventoryRow[]) ?? []);
-    setRevealed(0);
   };
 
   if (!owner) {
     return (
       <div className="container max-w-4xl pt-section-tight">
-        <div className="h-10 w-48 rounded-xl animate-pulse mb-4" style={{background: "#161616"}} />
+        <div className="h-10 w-48 rounded-xl animate-pulse mb-4" style={{background: "var(--glass-bg)", backdropFilter: "saturate(180%) blur(16px)", WebkitBackdropFilter: "saturate(180%) blur(16px)"}} />
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
           {Array.from({length: 12}).map((_, i) => (
             <div key={i} className="rounded-xl animate-pulse" style={{background: "#161616", aspectRatio: "3/4"}} />
@@ -175,10 +182,10 @@ export default function Journal() {
 
       {/* Header */}
       <div className="mb-5">
-        <h1 className="font-display text-[40px] leading-[0.95] tracking-[1px]" style={{color: "#f0ece4"}}>
+        <h1 className="font-display text-[40px] leading-[0.95] tracking-[1px]" style={{color: "hsl(var(--ink))"}}>
           {isMine ? "Мой журнал" : `@${owner.handle}`}
         </h1>
-        <p className="mt-1 text-[12px] uppercase tracking-[0.8px]" style={{color: "#6b6760"}}>
+        <p className="mt-1 text-[12px] uppercase tracking-[0.8px]" style={{color: "hsl(var(--subtle))"}}>
           Коллекция наклеек
         </p>
       </div>
@@ -188,14 +195,14 @@ export default function Journal() {
         {/* Progress */}
         <div className="flex items-center gap-4">
           <div>
-            <div className="font-display text-[28px] leading-none" style={{color: "#f0ece4"}}>{placedCount}<span className="text-[16px] ml-1" style={{color: "#6b6760"}}>/{totalCards}</span></div>
-            <div className="text-[11px] mt-0.5" style={{color: "#6b6760"}}>Собрано · {pct}%</div>
+            <div className="font-display text-[28px] leading-none" style={{color: "hsl(var(--ink))"}}>{placedCount}<span className="text-[16px] ml-1" style={{color: "hsl(var(--subtle))"}}>/{totalCards}</span></div>
+            <div className="text-[11px] mt-0.5" style={{color: "hsl(var(--subtle))"}}>Собрано · {pct}%</div>
           </div>
           {/* Progress bar */}
-          <div className="h-1.5 w-32 rounded-full overflow-hidden" style={{background: "#1e1e1e"}}>
+          <div className="h-1.5 w-32 rounded-full overflow-hidden" style={{background: "rgba(0,0,0,0.04)"}}>
             <motion.div
               className="h-full rounded-full"
-              style={{background: "#e8572a"}}
+              style={{background: "hsl(var(--orange))"}}
               initial={{width: 0}}
               animate={{width: `${pct}%`}}
               transition={{duration: 0.8, ease: [0.22, 1, 0.36, 1]}}
@@ -206,31 +213,31 @@ export default function Journal() {
         {/* Wallet + buttons */}
         {isMine && (
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-3 rounded-xl px-3 py-2 border" style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}>
+            <div className="flex items-center gap-3 rounded-xl px-3 py-2 border" style={{background: "#161616", borderColor: "var(--glass-border)"}}>
               <div className="text-center">
-                <div className="font-display text-[18px] tabular-nums leading-none" style={{color: "#f0ece4"}}>{points}</div>
-                <div className="text-[10px] uppercase tracking-[0.8px]" style={{color: "#6b6760"}}>очков</div>
+                <div className="font-display text-[18px] tabular-nums leading-none" style={{color: "hsl(var(--ink))"}}>{points}</div>
+                <div className="text-[10px] uppercase tracking-[0.8px]" style={{color: "hsl(var(--subtle))"}}>очков</div>
               </div>
               <div className="w-px h-8" style={{background: "rgba(255,255,255,0.07)"}} />
               <div className="text-center">
-                <div className="font-display text-[18px] tabular-nums leading-none" style={{color: "#f0ece4"}}>{shards}</div>
-                <div className="text-[10px] uppercase tracking-[0.8px]" style={{color: "#6b6760"}}>осколков</div>
+                <div className="font-display text-[18px] tabular-nums leading-none" style={{color: "hsl(var(--ink))"}}>{shards}</div>
+                <div className="text-[10px] uppercase tracking-[0.8px]" style={{color: "hsl(var(--subtle))"}}>осколков</div>
               </div>
             </div>
             <button
               onClick={buyPack}
-              disabled={busy || points < PACK_PRICE}
+              disabled={busy || !me}
               className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[13px] font-semibold transition-opacity disabled:opacity-40"
-              style={{background: "#e8572a", color: "#fff"}}
+              style={{background: "hsl(var(--orange))", color: "#fff"}}
             >
               <Package className="h-4 w-4" /> Открыть пак · {PACK_PRICE}
             </button>
             <button
               onClick={() => setDrawerOpen(true)}
               className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[13px] font-medium border transition-opacity hover:opacity-70"
-              style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)", color: "#f0ece4"}}
+              style={{background: "#161616", borderColor: "var(--glass-border)", color: "#f0ece4"}}
             >
-              <Sparkles className="h-4 w-4" style={{color: "#e8572a"}} />
+              <Sparkles className="h-4 w-4" style={{color: "hsl(var(--orange))"}} />
               Инвентарь · {inventory.length}
             </button>
           </div>
@@ -286,7 +293,7 @@ export default function Journal() {
                 />
                 {/* Owned badge if in inventory but not placed */}
                 {owned && !placed && (
-                  <div className="mt-1 text-center text-[10px] font-medium" style={{color: "#e8572a"}}>
+                  <div className="mt-1 text-center text-[10px] font-medium" style={{color: "hsl(var(--orange))"}}>
                     Есть!
                   </div>
                 )}
@@ -297,7 +304,7 @@ export default function Journal() {
       </div>
 
       {filteredCards.length === 0 && (
-        <div className="py-20 text-center" style={{color: "#6b6760"}}>
+        <div className="py-20 text-center" style={{color: "hsl(var(--subtle))"}}>
           <Lock className="h-8 w-8 mx-auto mb-3 opacity-40" />
           <p className="text-[14px]">Нет карточек в этой категории</p>
         </div>
@@ -309,7 +316,7 @@ export default function Journal() {
           <motion.div
             initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}}
             className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-3 sm:p-6"
-            style={{background: "rgba(0,0,0,0.75)", backdropFilter: "blur(12px)"}}
+            style={{background: "rgba(0,0,0,0.4)", backdropFilter: "blur(12px)"}}
             onClick={() => setDrawerOpen(false)}
           >
             <motion.div
@@ -317,18 +324,18 @@ export default function Journal() {
               initial={{y: 60, opacity: 0}} animate={{y: 0, opacity: 1}} exit={{y: 40, opacity: 0}}
               transition={{type: "spring", stiffness: 280, damping: 28}}
               className="w-full max-w-2xl rounded-2xl border overflow-hidden max-h-[80vh] flex flex-col"
-              style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}
+              style={{background: "#161616", borderColor: "var(--glass-border)"}}
             >
               {/* Drawer header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b" style={{borderColor: "rgba(255,255,255,0.07)"}}>
+              <div className="flex items-center justify-between px-5 py-4 border-b" style={{borderColor: "var(--glass-border)"}}>
                 <div>
-                  <h3 className="font-semibold text-[16px]" style={{color: "#f0ece4"}}>Инвентарь</h3>
-                  <p className="text-[12px]" style={{color: "#6b6760"}}>{inventory.length} наклеек</p>
+                  <h3 className="font-semibold text-[16px]" style={{color: "hsl(var(--ink))"}}>Инвентарь</h3>
+                  <p className="text-[12px]" style={{color: "hsl(var(--subtle))"}}>{inventory.length} наклеек</p>
                 </div>
                 <button
                   onClick={() => setDrawerOpen(false)}
                   className="h-8 w-8 flex items-center justify-center rounded-full border transition-opacity hover:opacity-70"
-                  style={{borderColor: "rgba(255,255,255,0.07)", color: "#9b9690"}}
+                  style={{borderColor: "var(--glass-border)", color: "#9b9690"}}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -337,7 +344,7 @@ export default function Journal() {
               {/* Drawer body */}
               <div className="overflow-auto p-5">
                 {inventory.length === 0 ? (
-                  <div className="py-16 text-center" style={{color: "#6b6760"}}>
+                  <div className="py-16 text-center" style={{color: "hsl(var(--subtle))"}}>
                     <Sparkles className="h-8 w-8 mx-auto mb-3 opacity-30" />
                     <p className="text-[14px]">Пока пусто. Сыграй матч или открой пак.</p>
                   </div>
@@ -357,7 +364,7 @@ export default function Journal() {
                               disabled={busy}
                               onClick={() => dustSticker(inv.id)}
                               className="w-full flex items-center justify-center gap-1 rounded-lg py-1.5 text-[11px] font-medium border transition-opacity hover:opacity-70 disabled:opacity-40"
-                              style={{background: "#1e1e1e", borderColor: "rgba(255,255,255,0.1)", color: "#9b9690"}}
+                              style={{background: "#1e1e1e", borderColor: "var(--glass-border)", color: "#9b9690"}}
                             >
                               <Trash2 className="h-3 w-3" /> +{dustValue(card.rarity, card.variant)}
                             </button>
@@ -366,7 +373,7 @@ export default function Journal() {
                               disabled={busy}
                               onClick={() => placeSticker(inv.id)}
                               className="w-full rounded-lg py-1.5 text-[11px] font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
-                              style={{background: "#e8572a", color: "#fff"}}
+                              style={{background: "hsl(var(--orange))", color: "#fff"}}
                             >
                               Наклеить
                             </button>
@@ -388,11 +395,11 @@ export default function Journal() {
           <motion.div
             initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}}
             className="fixed inset-0 z-[90] flex items-center justify-center p-4"
-            style={{background: "rgba(0,0,0,0.92)", backdropFilter: "blur(16px)"}}
+            style={{background: "rgba(0,0,0,0.55)", backdropFilter: "blur(16px)"}}
           >
             <div className="w-full max-w-2xl text-center">
-              <p className="text-[11px] uppercase tracking-[0.3em] mb-1 font-medium" style={{color: "#e8572a"}}>Пак открыт</p>
-              <h3 className="font-display text-[36px] mb-6" style={{color: "#f0ece4"}}>
+              <p className="text-[11px] uppercase tracking-[0.3em] mb-1 font-medium" style={{color: "hsl(var(--orange))"}}>Пак открыт</p>
+              <h3 className="font-display text-[36px] mb-6" style={{color: "hsl(var(--ink))"}}>
                 {opening.length} новых наклейки
               </h3>
               <div className="flex items-center justify-center gap-5 flex-wrap mb-8">
@@ -418,7 +425,7 @@ export default function Journal() {
                 <button
                   onClick={() => setRevealed((r) => r + 1)}
                   className="rounded-full px-8 py-3 text-[14px] font-semibold transition-opacity hover:opacity-80"
-                  style={{background: "#e8572a", color: "#fff"}}
+                  style={{background: "hsl(var(--orange))", color: "#fff"}}
                 >
                   Открыть ({revealed}/{opening.length})
                 </button>
@@ -426,7 +433,7 @@ export default function Journal() {
                 <button
                   onClick={() => { setOpening(null); setRevealed(0); setDrawerOpen(true); }}
                   className="rounded-full px-8 py-3 text-[14px] font-semibold border transition-opacity hover:opacity-70"
-                  style={{background: "#161616", borderColor: "rgba(255,255,255,0.15)", color: "#f0ece4"}}
+                  style={{background: "#161616", borderColor: "var(--glass-border)", color: "#f0ece4"}}
                 >
                   В инвентарь →
                 </button>

@@ -2,12 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import LevelLeagueCard from "@/components/gamification/LevelLeagueCard";
 import RatingCounter from "@/components/gamification/RatingCounter";
-import ExpandableSection from "@/components/profile/ExpandableSection";
-import RatingProgressChart from "@/components/profile/RatingProgressChart";
-import HeadToHeadCard from "@/components/profile/HeadToHeadCard";
-import PlayStyleCard from "@/components/profile/PlayStyleCard";
-import WinProbabilityCard from "@/components/profile/WinProbabilityCard";
-import { Activity, Brain, LineChart as LineChartIcon, Target, Users, Sticker, Share2 as ShareIcon } from "lucide-react";
+import { Sticker } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar } from "@/components/Layout";
 import AvatarUpload from "@/components/AvatarUpload";
@@ -294,44 +289,6 @@ export default function Profile() {
 
       {/* Premium expandable sections */}
       <div className="mb-8">
-        <ExpandableSection
-          title="График прогресса"
-          eyebrow="Динамика"
-          icon={<LineChartIcon className="h-4 w-4 text-orange" />}
-          defaultOpen
-        >
-          <RatingProgressChart playerId={player.id} currentRating={player.rating} matches={matches} />
-        </ExpandableSection>
-
-        <ExpandableSection
-          title="Стиль игры и AI инсайты"
-          eyebrow="Аналитика"
-          icon={<Brain className="h-4 w-4 text-orange" />}
-        >
-          <PlayStyleCard player={player} matches={matches} opponents={oppData} />
-        </ExpandableSection>
-
-        <ExpandableSection
-          title="Вероятность победы"
-          eyebrow="Перед матчем"
-          icon={<Target className="h-4 w-4 text-orange" />}
-        >
-          <WinProbabilityCard player={player} />
-        </ExpandableSection>
-
-        <ExpandableSection
-          title="Против соперников"
-          eyebrow="Head-to-head"
-          icon={<Users className="h-4 w-4 text-orange" />}
-        >
-          <HeadToHeadCard
-            playerId={player.id}
-            matches={matches}
-            opponents={Object.fromEntries(
-              Object.entries(oppData).map(([id, v]) => [id, { name: v.name, handle: v.handle }]),
-            )}
-          />
-        </ExpandableSection>
       </div>
 
       {/* Achievements */}

@@ -36,14 +36,14 @@ export default function Leaderboard() {
   return (
     <div className="container max-w-3xl pt-section-tight">
       <div className="mb-5">
-        <h1 className="font-display text-[42px] leading-[0.95] tracking-[1px]" style={{color: "#f0ece4"}}>Рейтинг</h1>
-        <p className="mt-1 text-[12px] uppercase tracking-[0.8px] font-medium" style={{color: "#6b6760"}}>Глобальная таблица</p>
+        <h1 className="font-display text-[42px] leading-[0.95] tracking-[1px]" style={{color: "hsl(var(--ink))"}}>Рейтинг</h1>
+        <p className="mt-1 text-[12px] uppercase tracking-[0.8px] font-medium" style={{color: "hsl(var(--subtle))"}}>Глобальная таблица</p>
       </div>
 
       {loading ? (
         <div className="rounded-2xl overflow-hidden border" style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="flex items-center justify-between px-4 py-3.5 border-b" style={{borderColor: "rgba(255,255,255,0.07)"}}>
+            <div key={i} className="flex items-center justify-between px-4 py-3.5 border-b" style={{borderColor: "var(--glass-border)"}}>
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <Skeleton className="h-4 w-6" />
                 <Skeleton className="h-9 w-9 rounded-full" />
@@ -57,7 +57,7 @@ export default function Leaderboard() {
           ))}
         </div>
       ) : players.length === 0 ? (
-        <p style={{color: "#9b9690"}}>Пока никого. Будь первым.</p>
+        <p style={{color: "hsl(var(--subtle))"}}>Пока никого. Будь первым.</p>
       ) : (
         <div className="rounded-2xl overflow-hidden border" style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}>
           {players.map((p, i) => (
@@ -65,7 +65,7 @@ export default function Leaderboard() {
               to={`/p/${p.handle}`}
               key={p.id}
               className="flex items-center justify-between px-4 py-3.5 border-b transition-opacity hover:opacity-75"
-              style={{borderColor: "rgba(255,255,255,0.07)"}}
+              style={{borderColor: "var(--glass-border)"}}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <span
@@ -76,11 +76,11 @@ export default function Leaderboard() {
                 </span>
                 <Avatar player={p} size={36} />
                 <div className="min-w-0">
-                  <div className="truncate text-[14px] font-medium" style={{color: "#f0ece4"}}>{p.name}</div>
-                  <div className="text-[11px] truncate" style={{color: "#6b6760"}}>@{p.handle} · {p.wins}В {p.losses}П</div>
+                  <div className="truncate text-[14px] font-medium" style={{color: "hsl(var(--ink))"}}>{p.name}</div>
+                  <div className="text-[11px] truncate" style={{color: "hsl(var(--subtle))"}}>@{p.handle} · {p.wins}В {p.losses}П</div>
                 </div>
               </div>
-              <span className="font-display text-[24px] tabular-nums ml-3 shrink-0" style={{color: "#f0ece4"}}>{p.rating}</span>
+              <span className="font-display text-[24px] tabular-nums ml-3 shrink-0" style={{color: "hsl(var(--ink))"}}>{p.rating}</span>
             </Link>
           ))}
         </div>

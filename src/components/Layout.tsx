@@ -34,8 +34,8 @@ export function Wordmark({ className = "" }: { className?: string }) {
           decoding="async"
         />
       </div>
-      <span className="font-display text-[1.15rem] tracking-[1px] text-foreground">
-        ПИНГ<span className="text-subtle">·</span>ТАБЛЕТ
+      <span className="font-display text-[1.15rem] tracking-[1px]" style={{color: "hsl(var(--ink))"}}>
+        ПИНГ<span style={{color: "hsl(var(--subtle))"}}>·</span>ТАБЛЕТ
       </span>
     </div>
   );
@@ -105,7 +105,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <header className="sticky top-0 z-40 border-b border-white/[0.07] safe-top" style={{background: "rgba(13,13,13,0.92)", backdropFilter: "blur(12px)"}}>
+      <header className="sticky top-0 z-40 safe-top" style={{background: "var(--glass-bg-heavy)", backdropFilter: "saturate(200%) blur(28px)", WebkitBackdropFilter: "saturate(200%) blur(28px)", borderBottom: "1px solid var(--glass-border)", boxShadow: "0 1px 0 rgba(0,0,0,0.06)"}}>
         <div className="container flex h-14 md:h-16 items-center justify-between gap-3">
           <Link to="/" aria-label="ПИНГ ТАБЛЕТ — на главную">
             <Wordmark />
@@ -312,13 +312,13 @@ function PingPongDock({
                 <it.icon
                   className="h-[22px] w-[22px] transition-colors"
                   strokeWidth={1.6}
-                  style={{ color: it.active ? "#e8572a" : "#6b6760" }}
+                  style={{ color: it.active ? "hsl(var(--orange))" : "hsl(var(--subtle))" }}
                 />
               )}
               {!isQr && (
                 <span
                   className="text-[10px] transition-colors"
-                  style={{ color: it.active ? "#e8572a" : "#6b6760" }}
+                  style={{ color: it.active ? "hsl(var(--orange))" : "hsl(var(--subtle))" }}
                 >
                   {it.label}
                 </span>
