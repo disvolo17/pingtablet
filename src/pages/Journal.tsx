@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Package, Sparkles, Trash2, X } from "lucide-react";
+import { Package, Sparkles, Trash2, X, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentPlayer } from "@/lib/currentPlayer";
 import { Button } from "@/components/ui/button";
@@ -28,12 +28,12 @@ export default function Journal() {
   const [opening, setOpening] = useState<StickerInventoryRow[] | null>(null);
   const [revealed, setRevealed] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [activeRarity, setActiveRarity] = useState<Rarity | "all">("all");
 
   const targetHandle = handleParam ?? me?.handle;
   const isMine = !!me && !!owner && owner.id === me.id;
 
   const reloadCollection = async (ownerId: string) => {
-    // Ensure every player in the system has a sticker card
     await supabase.rpc("sticker_ensure_all_cards");
     const [{ data: allCards }, { data: allPlayers }, { data: jr }, { data: pts }] = await Promise.all([
       supabase.from("sticker_cards").select("*"),
@@ -50,16 +50,13 @@ export default function Journal() {
     setPoints((pts as { balance: number } | null)?.balance ?? 0);
   };
 
-  // Load owner + cards + collection state
   useEffect(() => {
     if (!targetHandle) return;
     let cancelled = false;
     (async () => {
       const { data: p } = await supabase
-        .from("players")
-        .select("id, handle, name, rating, avatar_url")
-        .ilike("handle", targetHandle)
-        .maybeSingle();
+        .from("players").select("id, handle, name, rating, avatar_url")
+        .ilike("handle", targetHandle).maybeSingle();
       if (!p || cancelled) return;
       const ownerLite = p as PlayerLite;
       setOwner(ownerLite);
@@ -69,7 +66,6 @@ export default function Journal() {
     return () => { cancelled = true; };
   }, [targetHandle]);
 
-  // Load inventory + wallet (only if mine)
   useEffect(() => {
     if (!owner || !me || owner.id !== me.id) { setInventory([]); setShards(0); return; }
     let cancelled = false;
@@ -99,6 +95,7 @@ export default function Journal() {
   }, [owner, me]);
 
   const placedIds = useMemo(() => new Set(journal.map((j) => j.card_id)), [journal]);
+
   const cardsByRarity = useMemo(() => {
     const m: Record<Rarity, StickerCard[]> = { common: [], rare: [], epic: [], legendary: [], mythic: [] };
     for (const c of cards) m[c.rarity].push(c);
@@ -114,6 +111,11 @@ export default function Journal() {
     }
     return map;
   }, [inventory]);
+
+  const filteredCards = useMemo(() => {
+    if (activeRarity === "all") return cards;
+    return cardsByRarity[activeRarity];
+  }, [activeRarity, cards, cardsByRarity]);
 
   const placeSticker = async (invId: string) => {
     setBusy(true);
@@ -144,146 +146,237 @@ export default function Journal() {
   };
 
   if (!owner) {
-    return <div className="container py-20 text-center text-subtle">Загрузка журнала…</div>;
+    return (
+      <div className="container max-w-4xl pt-section-tight">
+        <div className="h-10 w-48 rounded-xl animate-pulse mb-4" style={{background: "#161616"}} />
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          {Array.from({length: 12}).map((_, i) => (
+            <div key={i} className="rounded-xl animate-pulse" style={{background: "#161616", aspectRatio: "3/4"}} />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   const totalCards = cards.length;
   const placedCount = journal.length;
   const pct = totalCards > 0 ? Math.round((placedCount / totalCards) * 100) : 0;
 
+  const RARITY_COLORS: Record<Rarity, string> = {
+    common: "#9b9690",
+    rare: "#60a5fa",
+    epic: "#a78bfa",
+    legendary: "#f59e0b",
+    mythic: "#f43f5e",
+  };
+
   return (
-    <div className="container max-w-5xl pt-page pb-24">
+    <div className="container max-w-4xl pt-section-tight pb-28">
+
       {/* Header */}
-      <div className="mb-6 flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-[10px] uppercase tracking-widest text-subtle mb-1">
-            {isMine ? "Твой" : `@${owner.handle} —`} журнал наклеек
-          </p>
-          <h1 className="pt-display text-3xl md:text-5xl">Коллекция</h1>
-          <p className="text-sm text-subtle mt-1">
-            {placedCount} / {totalCards} собрано · {pct}%
-          </p>
-          <div className="mt-3 h-2 w-64 max-w-full rounded-full bg-hairline overflow-hidden">
+      <div className="mb-5">
+        <h1 className="font-display text-[40px] leading-[0.95] tracking-[1px]" style={{color: "#f0ece4"}}>
+          {isMine ? "Мой журнал" : `@${owner.handle}`}
+        </h1>
+        <p className="mt-1 text-[12px] uppercase tracking-[0.8px]" style={{color: "#6b6760"}}>
+          Коллекция наклеек
+        </p>
+      </div>
+
+      {/* Stats + actions bar */}
+      <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
+        {/* Progress */}
+        <div className="flex items-center gap-4">
+          <div>
+            <div className="font-display text-[28px] leading-none" style={{color: "#f0ece4"}}>{placedCount}<span className="text-[16px] ml-1" style={{color: "#6b6760"}}>/{totalCards}</span></div>
+            <div className="text-[11px] mt-0.5" style={{color: "#6b6760"}}>Собрано · {pct}%</div>
+          </div>
+          {/* Progress bar */}
+          <div className="h-1.5 w-32 rounded-full overflow-hidden" style={{background: "#1e1e1e"}}>
             <motion.div
-              className="h-full bg-orange"
-              initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="h-full rounded-full"
+              style={{background: "#e8572a"}}
+              initial={{width: 0}}
+              animate={{width: `${pct}%`}}
+              transition={{duration: 0.8, ease: [0.22, 1, 0.36, 1]}}
             />
           </div>
         </div>
+
+        {/* Wallet + buttons */}
         {isMine && (
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="text-right text-xs">
-              <div className="font-display text-xl font-bold tabular-nums">{points}</div>
-              <div className="text-[10px] text-subtle uppercase tracking-widest">очков</div>
+            <div className="flex items-center gap-3 rounded-xl px-3 py-2 border" style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}>
+              <div className="text-center">
+                <div className="font-display text-[18px] tabular-nums leading-none" style={{color: "#f0ece4"}}>{points}</div>
+                <div className="text-[10px] uppercase tracking-[0.8px]" style={{color: "#6b6760"}}>очков</div>
+              </div>
+              <div className="w-px h-8" style={{background: "rgba(255,255,255,0.07)"}} />
+              <div className="text-center">
+                <div className="font-display text-[18px] tabular-nums leading-none" style={{color: "#f0ece4"}}>{shards}</div>
+                <div className="text-[10px] uppercase tracking-[0.8px]" style={{color: "#6b6760"}}>осколков</div>
+              </div>
             </div>
-            <div className="text-right text-xs">
-              <div className="font-display text-xl font-bold tabular-nums">{shards}</div>
-              <div className="text-[10px] text-subtle uppercase tracking-widest">осколков</div>
-            </div>
-            <Button onClick={buyPack} disabled={busy || points < PACK_PRICE} className="rounded-full">
-              <Package className="h-4 w-4 mr-1.5" /> Пак · {PACK_PRICE}
-            </Button>
-            <Button variant="outline" onClick={() => setDrawerOpen(true)} className="rounded-full">
-              <Sparkles className="h-4 w-4 mr-1.5" /> Инвентарь · {inventory.length}
-            </Button>
+            <button
+              onClick={buyPack}
+              disabled={busy || points < PACK_PRICE}
+              className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[13px] font-semibold transition-opacity disabled:opacity-40"
+              style={{background: "#e8572a", color: "#fff"}}
+            >
+              <Package className="h-4 w-4" /> Открыть пак · {PACK_PRICE}
+            </button>
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[13px] font-medium border transition-opacity hover:opacity-70"
+              style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)", color: "#f0ece4"}}
+            >
+              <Sparkles className="h-4 w-4" style={{color: "#e8572a"}} />
+              Инвентарь · {inventory.length}
+            </button>
           </div>
         )}
       </div>
 
-      {/* Album by rarity */}
-      <div className="space-y-8">
-        {RARITY_ORDER.map((rar) => {
-          const list = cardsByRarity[rar];
-          if (list.length === 0) return null;
+      {/* Rarity filter tabs */}
+      <div className="flex items-center gap-1.5 mb-5 overflow-x-auto pb-1 scrollbar-none">
+        {(["all", ...RARITY_ORDER] as const).map((rar) => {
+          const isActive = activeRarity === rar;
+          const count = rar === "all" ? cards.length : cardsByRarity[rar].length;
           return (
-            <section key={rar}>
-              <h2 className="font-display text-sm uppercase tracking-[0.2em] text-subtle mb-3">
-                {RARITY_LABEL[rar]} <span className="text-ink/50">· {list.filter(c => placedIds.has(c.id)).length}/{list.length}</span>
-              </h2>
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 sm:gap-4">
-                {list.map((c) => {
-                  const placed = placedIds.has(c.id);
-                  const owned = isMine && inventoryGrouped.has(c.id);
-                  const player = players[c.player_id];
-                  return (
-                    <PixelStickerCard
-                      key={c.id}
-                      card={c}
-                      player={player}
-                      size="sm"
-                      silhouette={!placed}
-                      faded={!placed && !owned}
-                      onClick={() => player && navigate(`/p/${player.handle}`)}
-                    />
-                  );
-                })}
-              </div>
-            </section>
+            <button
+              key={rar}
+              onClick={() => setActiveRarity(rar)}
+              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-medium whitespace-nowrap transition-all border shrink-0"
+              style={{
+                background: isActive ? (rar === "all" ? "#e8572a" : RARITY_COLORS[rar]) : "#161616",
+                borderColor: isActive ? "transparent" : "rgba(255,255,255,0.07)",
+                color: isActive ? "#fff" : "#9b9690",
+              }}
+            >
+              {rar === "all" ? "Все" : RARITY_LABEL[rar]}
+              <span className="opacity-60 text-[10px]">{count}</span>
+            </button>
           );
         })}
       </div>
+
+      {/* Card grid */}
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+        <AnimatePresence mode="popLayout">
+          {filteredCards.map((c) => {
+            const placed = placedIds.has(c.id);
+            const owned = isMine && inventoryGrouped.has(c.id);
+            const player = players[c.player_id];
+            return (
+              <motion.div
+                key={c.id}
+                layout
+                initial={{opacity: 0, scale: 0.9}}
+                animate={{opacity: 1, scale: 1}}
+                exit={{opacity: 0, scale: 0.9}}
+                transition={{duration: 0.2}}
+              >
+                <PixelStickerCard
+                  card={c}
+                  player={player}
+                  size="sm"
+                  silhouette={!placed}
+                  faded={!placed && !owned}
+                  onClick={() => player && navigate(`/p/${player.handle}`)}
+                />
+                {/* Owned badge if in inventory but not placed */}
+                {owned && !placed && (
+                  <div className="mt-1 text-center text-[10px] font-medium" style={{color: "#e8572a"}}>
+                    Есть!
+                  </div>
+                )}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      {filteredCards.length === 0 && (
+        <div className="py-20 text-center" style={{color: "#6b6760"}}>
+          <Lock className="h-8 w-8 mx-auto mb-3 opacity-40" />
+          <p className="text-[14px]">Нет карточек в этой категории</p>
+        </div>
+      )}
 
       {/* Inventory drawer */}
       <AnimatePresence>
         {drawerOpen && isMine && (
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}}
             className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-3 sm:p-6"
-            style={{ background: "hsl(var(--background) / 0.7)", backdropFilter: "blur(10px)" }}
+            style={{background: "rgba(0,0,0,0.75)", backdropFilter: "blur(12px)"}}
             onClick={() => setDrawerOpen(false)}
           >
             <motion.div
               onClick={(e) => e.stopPropagation()}
-              initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 280, damping: 28 }}
-              className="w-full max-w-2xl pt-card pt-pad max-h-[80vh] overflow-auto"
+              initial={{y: 60, opacity: 0}} animate={{y: 0, opacity: 1}} exit={{y: 40, opacity: 0}}
+              transition={{type: "spring", stiffness: 280, damping: 28}}
+              className="w-full max-w-2xl rounded-2xl border overflow-hidden max-h-[80vh] flex flex-col"
+              style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}
             >
-              <div className="flex items-center justify-between mb-4">
+              {/* Drawer header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b" style={{borderColor: "rgba(255,255,255,0.07)"}}>
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-subtle">Инвентарь</p>
-                  <h3 className="font-display text-xl font-bold">{inventory.length} наклеек</h3>
+                  <h3 className="font-semibold text-[16px]" style={{color: "#f0ece4"}}>Инвентарь</h3>
+                  <p className="text-[12px]" style={{color: "#6b6760"}}>{inventory.length} наклеек</p>
                 </div>
-                <button onClick={() => setDrawerOpen(false)} className="h-8 w-8 inline-flex items-center justify-center rounded-full hairline">
+                <button
+                  onClick={() => setDrawerOpen(false)}
+                  className="h-8 w-8 flex items-center justify-center rounded-full border transition-opacity hover:opacity-70"
+                  style={{borderColor: "rgba(255,255,255,0.07)", color: "#9b9690"}}
+                >
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              {inventory.length === 0 ? (
-                <p className="text-sm text-subtle py-12 text-center">Пока пусто. Сыграй матч или открой пак.</p>
-              ) : (
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {Array.from(inventoryGrouped.entries()).map(([cardId, items]) => {
-                    const card = cards.find((c) => c.id === cardId);
-                    const player = card ? players[card.player_id] : undefined;
-                    if (!card) return null;
-                    const isDup = placedIds.has(cardId);
-                    const inv = items[0];
-                    return (
-                      <div key={cardId} className="flex flex-col items-center gap-2">
-                        <PixelStickerCard card={card} player={player} size="sm" count={items.length} />
-                        {isDup ? (
-                          <Button
-                            size="sm" variant="outline" disabled={busy}
-                            onClick={() => dustSticker(inv.id)}
-                            className="w-full rounded-full text-[11px] h-7"
-                          >
-                            <Trash2 className="h-3 w-3 mr-1" /> +{dustValue(card.rarity, card.variant)}
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm" disabled={busy}
-                            onClick={() => placeSticker(inv.id)}
-                            className="w-full rounded-full text-[11px] h-7 bg-orange hover:bg-orange/90"
-                          >
-                            Наклеить
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+
+              {/* Drawer body */}
+              <div className="overflow-auto p-5">
+                {inventory.length === 0 ? (
+                  <div className="py-16 text-center" style={{color: "#6b6760"}}>
+                    <Sparkles className="h-8 w-8 mx-auto mb-3 opacity-30" />
+                    <p className="text-[14px]">Пока пусто. Сыграй матч или открой пак.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                    {Array.from(inventoryGrouped.entries()).map(([cardId, items]) => {
+                      const card = cards.find((c) => c.id === cardId);
+                      const player = card ? players[card.player_id] : undefined;
+                      if (!card) return null;
+                      const isDup = placedIds.has(cardId);
+                      const inv = items[0];
+                      return (
+                        <div key={cardId} className="flex flex-col items-center gap-2">
+                          <PixelStickerCard card={card} player={player} size="sm" count={items.length} />
+                          {isDup ? (
+                            <button
+                              disabled={busy}
+                              onClick={() => dustSticker(inv.id)}
+                              className="w-full flex items-center justify-center gap-1 rounded-lg py-1.5 text-[11px] font-medium border transition-opacity hover:opacity-70 disabled:opacity-40"
+                              style={{background: "#1e1e1e", borderColor: "rgba(255,255,255,0.1)", color: "#9b9690"}}
+                            >
+                              <Trash2 className="h-3 w-3" /> +{dustValue(card.rarity, card.variant)}
+                            </button>
+                          ) : (
+                            <button
+                              disabled={busy}
+                              onClick={() => placeSticker(inv.id)}
+                              className="w-full rounded-lg py-1.5 text-[11px] font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
+                              style={{background: "#e8572a", color: "#fff"}}
+                            >
+                              Наклеить
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -293,14 +386,16 @@ export default function Journal() {
       <AnimatePresence>
         {opening && (
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}}
             className="fixed inset-0 z-[90] flex items-center justify-center p-4"
-            style={{ background: "hsl(0 0% 0% / 0.85)", backdropFilter: "blur(14px)" }}
+            style={{background: "rgba(0,0,0,0.92)", backdropFilter: "blur(16px)"}}
           >
             <div className="w-full max-w-2xl text-center">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-orange mb-1">Пак открыт</p>
-              <h3 className="font-display text-3xl font-bold mb-6" style={{ color: "hsl(0 0% 96%)" }}>3 новые наклейки</h3>
-              <div className="flex items-center justify-center gap-4 flex-wrap mb-8">
+              <p className="text-[11px] uppercase tracking-[0.3em] mb-1 font-medium" style={{color: "#e8572a"}}>Пак открыт</p>
+              <h3 className="font-display text-[36px] mb-6" style={{color: "#f0ece4"}}>
+                {opening.length} новых наклейки
+              </h3>
+              <div className="flex items-center justify-center gap-5 flex-wrap mb-8">
                 {opening.map((inv, i) => {
                   const card = cards.find((c) => c.id === inv.card_id);
                   const player = card ? players[card.player_id] : undefined;
@@ -308,25 +403,33 @@ export default function Journal() {
                   return (
                     <motion.div
                       key={inv.id}
-                      initial={{ rotateY: 180, scale: 0.7, opacity: 0 }}
-                      animate={shown ? { rotateY: 0, scale: 1, opacity: 1 } : { rotateY: 180, scale: 0.85, opacity: 0.6 }}
-                      transition={{ type: "spring", stiffness: 220, damping: 22, delay: shown ? 0 : 0 }}
+                      initial={{rotateY: 180, scale: 0.7, opacity: 0}}
+                      animate={shown
+                        ? {rotateY: 0, scale: 1, opacity: 1}
+                        : {rotateY: 180, scale: 0.85, opacity: 0.5}}
+                      transition={{type: "spring", stiffness: 220, damping: 22}}
                     >
-                      {card ? (
-                        <PixelStickerCard card={card} player={player} size="md" />
-                      ) : null}
+                      {card ? <PixelStickerCard card={card} player={player} size="md" /> : null}
                     </motion.div>
                   );
                 })}
               </div>
               {revealed < opening.length ? (
-                <Button onClick={() => setRevealed((r) => r + 1)} className="rounded-full">
+                <button
+                  onClick={() => setRevealed((r) => r + 1)}
+                  className="rounded-full px-8 py-3 text-[14px] font-semibold transition-opacity hover:opacity-80"
+                  style={{background: "#e8572a", color: "#fff"}}
+                >
                   Открыть ({revealed}/{opening.length})
-                </Button>
+                </button>
               ) : (
-                <Button onClick={() => { setOpening(null); setRevealed(0); setDrawerOpen(true); }} className="rounded-full bg-orange hover:bg-orange/90">
-                  В инвентарь
-                </Button>
+                <button
+                  onClick={() => { setOpening(null); setRevealed(0); setDrawerOpen(true); }}
+                  className="rounded-full px-8 py-3 text-[14px] font-semibold border transition-opacity hover:opacity-70"
+                  style={{background: "#161616", borderColor: "rgba(255,255,255,0.15)", color: "#f0ece4"}}
+                >
+                  В инвентарь →
+                </button>
               )}
             </div>
           </motion.div>

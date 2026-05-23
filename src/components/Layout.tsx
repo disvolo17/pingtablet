@@ -12,7 +12,7 @@ import StickerDropOverlay from "@/components/stickers/StickerDropOverlay";
 import ForcePasswordChange from "@/components/ForcePasswordChange";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { LogOut, User, KeyRound, Home, Trophy, QrCode, CalendarDays, Sticker } from "lucide-react";
+import { LogOut, User, KeyRound, Home, Trophy, QrCode, Sticker } from "lucide-react";
 import logoMark from "@/assets/logo-mark.jpg";
 
 // Маршруты, для которых не требуется авторизация игрока
@@ -265,7 +265,6 @@ function PingPongDock({
 }) {
   const items: DockItemDef[] = [
     { to: "/", label: "Главная", icon: Home, active: pathname === "/" },
-    { to: "/events", label: "События", icon: CalendarDays, active: pathname.startsWith("/events") },
     { to: "/scan", label: "Скан", icon: QrCode, active: pathname.startsWith("/scan") },
     { to: "/leaderboard", label: "Рейтинг", icon: Trophy, active: pathname.startsWith("/leaderboard") },
     {
