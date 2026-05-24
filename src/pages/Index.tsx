@@ -58,7 +58,7 @@ const Index = () => {
 
             {/* Stat cards */}
             <div className="mt-5 grid grid-cols-2 gap-2.5 md:gap-3 max-w-sm">
-              <Link to="/leaderboard" className="rounded-2xl p-3.5 border relative overflow-hidden" style={{background: "#161616", borderColor: "#e8572a"}}>
+              <Link to="/leaderboard" className="rounded-2xl p-3.5 border relative overflow-hidden" style={{background: "rgba(255,255,255,0.62)", backdropFilter: "saturate(200%) blur(24px)", WebkitBackdropFilter: "saturate(200%) blur(24px)", borderColor: "#e8572a"}}>
                 <div className="absolute top-0 left-0 right-0 h-[2px]" style={{background: "hsl(var(--orange))"}} />
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{background: "hsl(var(--orange))"}} />
@@ -67,7 +67,7 @@ const Index = () => {
                 <div className="font-display text-[30px] leading-none" style={{color: "hsl(var(--ink))"}}>{loading ? "—" : live.length}</div>
                 <div className="mt-1 text-[11px]" style={{color: "hsl(var(--subtle))"}}>Турниров</div>
               </Link>
-              <Link to="/leaderboard" className="rounded-2xl p-3.5 border" style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}>
+              <Link to="/leaderboard" className="rounded-2xl p-3.5 border" style={{background: "rgba(255,255,255,0.62)", backdropFilter: "saturate(200%) blur(24px)", WebkitBackdropFilter: "saturate(200%) blur(24px)", borderColor: "rgba(255,255,255,0.85)"}}>
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <Trophy className="h-3 w-3" style={{color: "hsl(var(--subtle))"}} />
                   <span className="text-[10px] font-medium uppercase tracking-[0.8px]" style={{color: "hsl(var(--subtle))"}}>Топ рейтинг</span>
@@ -75,7 +75,7 @@ const Index = () => {
                 <div className="font-display text-[30px] leading-none tabular-nums" style={{color: "hsl(var(--ink))"}}>{top ? top.rating : "—"}</div>
                 <div className="mt-1 text-[11px] truncate" style={{color: "hsl(var(--subtle))"}}>{top ? `@${top.handle}` : "—"}</div>
               </Link>
-              <Link to="/events" className="col-span-2 rounded-2xl p-3.5 border flex items-center justify-between" style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}>
+              <Link to="/events" className="col-span-2 rounded-2xl p-3.5 border flex items-center justify-between" style={{background: "rgba(255,255,255,0.62)", backdropFilter: "saturate(200%) blur(24px)", WebkitBackdropFilter: "saturate(200%) blur(24px)", borderColor: "rgba(255,255,255,0.85)"}}>
                 <div>
                   <div className="text-[10px] font-medium uppercase tracking-[0.8px]" style={{color: "hsl(var(--subtle))"}}>События</div>
                   <div className="text-sm font-medium mt-0.5" style={{color: "hsl(var(--ink))"}}>Все турниры и расписание</div>
@@ -97,7 +97,7 @@ const Index = () => {
             { n: "3", icon: Trophy, title: "Побеждай" },
           ].map((s, i, arr) => (
             <div key={s.n} className="flex items-center gap-1.5">
-              <span className="inline-flex items-center justify-center h-5 w-5 rounded-full text-[10px] font-semibold shrink-0" style={{background: "#1e1e1e", border: "1px solid rgba(255,255,255,0.13)", color: "#9b9690"}}>{s.n}</span>
+              <span className="inline-flex items-center justify-center h-5 w-5 rounded-full text-[10px] font-semibold shrink-0" style={{background: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.13)", color: "#6b7280"}}>{s.n}</span>
               <span className="font-medium">{s.title}</span>
               {i < arr.length - 1 && <span style={{color: "rgba(255,255,255,0.13)"}}>·</span>}
             </div>
@@ -126,7 +126,7 @@ const Index = () => {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             {live.map((t) => (
-              <Link key={t.id} to={`/t/${t.id}`} className="rounded-2xl p-4 border flex items-center justify-between group transition-opacity hover:opacity-80" style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}>
+              <Link key={t.id} to={`/t/${t.id}`} className="rounded-2xl p-4 border flex items-center justify-between group transition-opacity hover:opacity-80" style={{background: "rgba(255,255,255,0.62)", backdropFilter: "saturate(200%) blur(24px)", WebkitBackdropFilter: "saturate(200%) blur(24px)", borderColor: "rgba(255,255,255,0.85)"}}>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-2">
                     {t.status === "live" ? (
