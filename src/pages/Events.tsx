@@ -55,8 +55,8 @@ export default function Events() {
         transition={{ duration: 0.4 }}
         className="mb-6"
       >
-        <h1 className="font-display text-[42px] leading-[0.95] tracking-[1px]" style={{color: "#f0ece4"}}>События</h1>
-        <p className="mt-2 text-[13px] leading-relaxed" style={{color: "#9b9690"}}>
+        <h1 className="font-display text-[42px] leading-[0.95] tracking-[1px]" style={{color: "#1a1a2e"}}>События</h1>
+        <p className="mt-2 text-[13px] leading-relaxed" style={{color: "#6b7280"}}>
           Ближайшие и прошедшие турниры. Добавляй в свой календарь.
         </p>
       </motion.div>
@@ -72,7 +72,7 @@ export default function Events() {
           <div className="space-y-10 md:space-y-12">
             {grouped.map(({ key, label, list }) => (
               <section key={key}>
-                <h2 className="text-[11px] uppercase tracking-[0.2em] mb-4 pl-10 md:pl-12 font-medium" style={{color: "#6b6760"}}>
+                <h2 className="text-[11px] uppercase tracking-[0.2em] mb-4 pl-10 md:pl-12 font-medium" style={{color: "#6b7280"}}>
                   {label}
                 </h2>
                 <div className="space-y-5 md:space-y-6">

@@ -162,13 +162,13 @@ export default function MatchPage() {
 
   if (loading) return (
     <div className="container max-w-xl pt-section-tight">
-      <div className="h-48 rounded-2xl animate-pulse" style={{background: "var(--glass-bg)", backdropFilter: "saturate(180%) blur(16px)", WebkitBackdropFilter: "saturate(180%) blur(16px)"}} />
+      <div className="h-48 rounded-2xl animate-pulse" style={{background: "rgba(255,255,255,0.62)", backdropFilter: "saturate(180%) blur(16px)", WebkitBackdropFilter: "saturate(180%) blur(16px)"}} />
     </div>
   );
 
   if (!match || !p1 || !p2) return (
     <div className="container max-w-xl pt-section-tight">
-      <p style={{color: "hsl(var(--subtle))"}}>Матч не найден.</p>
+      <p style={{color: "#6b7280"}}>Матч не найден.</p>
     </div>
   );
 
@@ -181,7 +181,7 @@ export default function MatchPage() {
         <Link
           to={`/t/${tournament.id}`}
           className="inline-flex items-center gap-1.5 text-[13px] transition-opacity hover:opacity-70"
-          style={{color: "hsl(var(--subtle))"}}
+          style={{color: "#6b7280"}}
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           {tournament.name}
@@ -196,8 +196,8 @@ export default function MatchPage() {
         style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}
       >
         {/* Статус */}
-        <div className="px-4 pt-4 pb-3 flex items-center justify-between border-b" style={{borderColor: "var(--glass-border)"}}>
-          <span className="text-[11px] font-medium uppercase tracking-[0.8px]" style={{color: "hsl(var(--subtle))"}}>
+        <div className="px-4 pt-4 pb-3 flex items-center justify-between border-b" style={{borderColor: "rgba(255,255,255,0.85)"}}>
+          <span className="text-[11px] font-medium uppercase tracking-[0.8px]" style={{color: "#6b7280"}}>
             {tournament ? roundLabel(match.round, 99) : `Раунд ${match.round}`}
           </span>
           {winner ? (
@@ -205,8 +205,8 @@ export default function MatchPage() {
               Завершён
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-[11px] font-medium" style={{color: "hsl(var(--orange))"}}>
-              <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{background: "hsl(var(--orange))"}} />
+            <span className="flex items-center gap-1.5 text-[11px] font-medium" style={{color: "#e8572a"}}>
+              <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{background: "#e8572a"}} />
               В игре
             </span>
           )}
@@ -222,16 +222,16 @@ export default function MatchPage() {
                 <Trophy className="h-3 w-3" /> Победа
               </span>
             )}
-            <Link to={`/p/${p1.handle}`} className="text-[14px] font-semibold text-center hover:underline underline-offset-4" style={{color: "hsl(var(--ink))"}}>
+            <Link to={`/p/${p1.handle}`} className="text-[14px] font-semibold text-center hover:underline underline-offset-4" style={{color: "#1a1a2e"}}>
               {p1.name}
             </Link>
-            <span className="text-[12px]" style={{color: "hsl(var(--subtle))"}}>@{p1.handle}</span>
-            <span className="font-display text-[22px]" style={{color: "hsl(var(--ink))"}}>{p1.rating}</span>
+            <span className="text-[12px]" style={{color: "#6b7280"}}>@{p1.handle}</span>
+            <span className="font-display text-[22px]" style={{color: "#1a1a2e"}}>{p1.rating}</span>
           </div>
 
           {/* VS */}
           <div className="flex items-center justify-center px-2">
-            <span className="font-display text-[18px]" style={{color: "hsl(var(--subtle))"}}>VS</span>
+            <span className="font-display text-[18px]" style={{color: "#6b7280"}}>VS</span>
           </div>
 
           {/* Игрок 2 */}
@@ -242,11 +242,11 @@ export default function MatchPage() {
                 <Trophy className="h-3 w-3" /> Победа
               </span>
             )}
-            <Link to={`/p/${p2.handle}`} className="text-[14px] font-semibold text-center hover:underline underline-offset-4" style={{color: "hsl(var(--ink))"}}>
+            <Link to={`/p/${p2.handle}`} className="text-[14px] font-semibold text-center hover:underline underline-offset-4" style={{color: "#1a1a2e"}}>
               {p2.name}
             </Link>
-            <span className="text-[12px]" style={{color: "hsl(var(--subtle))"}}>@{p2.handle}</span>
-            <span className="font-display text-[22px]" style={{color: "hsl(var(--ink))"}}>{p2.rating}</span>
+            <span className="text-[12px]" style={{color: "#6b7280"}}>@{p2.handle}</span>
+            <span className="font-display text-[22px]" style={{color: "#1a1a2e"}}>{p2.rating}</span>
           </div>
         </div>
       </motion.div>
@@ -254,8 +254,8 @@ export default function MatchPage() {
       {/* Голосование */}
       <div className="rounded-2xl border p-4 space-y-3" style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}>
         <div className="flex items-center justify-between">
-          <h2 className="text-[14px] font-semibold" style={{color: "hsl(var(--ink))"}}>Голосование</h2>
-          <span className="text-[12px]" style={{color: "hsl(var(--subtle))"}}>{totalVotes} голосов</span>
+          <h2 className="text-[14px] font-semibold" style={{color: "#1a1a2e"}}>Голосование</h2>
+          <span className="text-[12px]" style={{color: "#6b7280"}}>{totalVotes} голосов</span>
         </div>
 
         {/* Прогресс бар */}
@@ -290,9 +290,9 @@ export default function MatchPage() {
                   cursor: voting ? "wait" : "pointer",
                 }}
               >
-                <div className="text-[13px] font-medium truncate" style={{color: "hsl(var(--ink))"}}>{player.name}</div>
+                <div className="text-[13px] font-medium truncate" style={{color: "#1a1a2e"}}>{player.name}</div>
                 <div className="flex items-center justify-between mt-1.5">
-                  <span className="text-[12px]" style={{color: "hsl(var(--subtle))"}}>{voteCount} голосов</span>
+                  <span className="text-[12px]" style={{color: "#6b7280"}}>{voteCount} голосов</span>
                   <span className="font-display text-[16px]" style={{color: isMyVote ? "#e8572a" : "#9b9690"}}>{pct}%</span>
                 </div>
               </button>
@@ -300,7 +300,7 @@ export default function MatchPage() {
           })}
         </div>
         {!me && (
-          <p className="text-[12px] text-center" style={{color: "hsl(var(--subtle))"}}>
+          <p className="text-[12px] text-center" style={{color: "#6b7280"}}>
             Войди чтобы проголосовать
           </p>
         )}
@@ -308,22 +308,22 @@ export default function MatchPage() {
 
       {/* Статистика игроков */}
       <div className="rounded-2xl border overflow-hidden" style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}>
-        <div className="px-4 py-3 border-b" style={{borderColor: "var(--glass-border)"}}>
-          <h2 className="text-[14px] font-semibold" style={{color: "hsl(var(--ink))"}}>Статистика</h2>
+        <div className="px-4 py-3 border-b" style={{borderColor: "rgba(255,255,255,0.85)"}}>
+          <h2 className="text-[14px] font-semibold" style={{color: "#1a1a2e"}}>Статистика</h2>
         </div>
 
         {/* H2H */}
-        <div className="px-4 py-3 border-b" style={{borderColor: "var(--glass-border)"}}>
-          <div className="text-[11px] uppercase tracking-[0.8px] mb-2" style={{color: "hsl(var(--subtle))"}}>Личные встречи</div>
+        <div className="px-4 py-3 border-b" style={{borderColor: "rgba(255,255,255,0.85)"}}>
+          <div className="text-[11px] uppercase tracking-[0.8px] mb-2" style={{color: "#6b7280"}}>Личные встречи</div>
           <div className="grid grid-cols-3 text-center">
             <span className="font-display text-[24px]" style={{color: h2h.wins1 > h2h.wins2 ? "#e8572a" : "#f0ece4"}}>{h2h.wins1}</span>
-            <span className="text-[12px] self-center" style={{color: "hsl(var(--subtle))"}}>побед</span>
+            <span className="text-[12px] self-center" style={{color: "#6b7280"}}>побед</span>
             <span className="font-display text-[24px]" style={{color: h2h.wins2 > h2h.wins1 ? "#e8572a" : "#f0ece4"}}>{h2h.wins2}</span>
           </div>
           <div className="grid grid-cols-3 text-center mt-1">
-            <span className="text-[11px] truncate" style={{color: "hsl(var(--subtle))"}}>{p1.name}</span>
+            <span className="text-[11px] truncate" style={{color: "#6b7280"}}>{p1.name}</span>
             <span />
-            <span className="text-[11px] truncate" style={{color: "hsl(var(--subtle))"}}>{p2.name}</span>
+            <span className="text-[11px] truncate" style={{color: "#6b7280"}}>{p2.name}</span>
           </div>
         </div>
 
@@ -338,10 +338,10 @@ export default function MatchPage() {
             v2: p2.wins + p2.losses > 0 ? `${Math.round((p2.wins / (p2.wins + p2.losses)) * 100)}%` : "—",
           },
         ].map(({ label, v1, v2 }) => (
-          <div key={label} className="grid grid-cols-3 items-center px-4 py-2.5 border-b last:border-0" style={{borderColor: "var(--glass-border)"}}>
-            <span className="font-semibold text-[14px] tabular-nums" style={{color: "hsl(var(--ink))"}}>{v1}</span>
-            <span className="text-[11px] text-center uppercase tracking-[0.6px]" style={{color: "hsl(var(--subtle))"}}>{label}</span>
-            <span className="font-semibold text-[14px] tabular-nums text-right" style={{color: "hsl(var(--ink))"}}>{v2}</span>
+          <div key={label} className="grid grid-cols-3 items-center px-4 py-2.5 border-b last:border-0" style={{borderColor: "rgba(255,255,255,0.85)"}}>
+            <span className="font-semibold text-[14px] tabular-nums" style={{color: "#1a1a2e"}}>{v1}</span>
+            <span className="text-[11px] text-center uppercase tracking-[0.6px]" style={{color: "#6b7280"}}>{label}</span>
+            <span className="font-semibold text-[14px] tabular-nums text-right" style={{color: "#1a1a2e"}}>{v2}</span>
           </div>
         ))}
       </div>
@@ -355,8 +355,8 @@ export default function MatchPage() {
             className="rounded-xl p-3 border flex items-center justify-between transition-opacity hover:opacity-70"
             style={{background: "#161616", borderColor: "rgba(255,255,255,0.07)"}}
           >
-            <span className="text-[13px] font-medium truncate" style={{color: "hsl(var(--ink))"}}>@{p.handle}</span>
-            <ChevronRight className="h-4 w-4 shrink-0" style={{color: "hsl(var(--orange))"}} />
+            <span className="text-[13px] font-medium truncate" style={{color: "#1a1a2e"}}>@{p.handle}</span>
+            <ChevronRight className="h-4 w-4 shrink-0" style={{color: "#e8572a"}} />
           </Link>
         ))}
       </div>
