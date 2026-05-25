@@ -104,7 +104,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col" style={{background: "linear-gradient(135deg, #f5e6ff 0%, #fde8e0 25%, #e0eeff 60%, #e8f5e9 100%)", backgroundAttachment: "fixed"}}>
       <header className="sticky top-0 z-40 safe-top" style={{background: "var(--glass-bg-heavy)", backdropFilter: "saturate(200%) blur(28px)", WebkitBackdropFilter: "saturate(200%) blur(28px)", borderBottom: "1px solid var(--glass-border)", boxShadow: "0 1px 0 rgba(0,0,0,0.06)"}}>
         <div className="container flex h-14 md:h-16 items-center justify-between gap-3">
           <Link to="/" aria-label="ПИНГ ТАБЛЕТ — на главную">
