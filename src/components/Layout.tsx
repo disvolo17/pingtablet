@@ -34,8 +34,8 @@ export function Wordmark({ className = "" }: { className?: string }) {
           decoding="async"
         />
       </div>
-      <span className="font-display text-[1.15rem] tracking-[1px]" style={{color: "hsl(var(--ink))"}}>
-        ПИНГ<span style={{color: "hsl(var(--subtle))"}}>·</span>ТАБЛЕТ
+      <span className="font-display text-[1.15rem] tracking-[1px]" style={{color: "#1a1a2e"}}>
+        ПИНГ<span style={{color: "#6b7280"}}>·</span>ТАБЛЕТ
       </span>
     </div>
   );
@@ -104,8 +104,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col" style={{background: "linear-gradient(135deg, #f5e6ff 0%, #fde8e0 25%, #e0eeff 60%, #e8f5e9 100%)", backgroundAttachment: "fixed"}}>
-      <header className="sticky top-0 z-40 safe-top" style={{background: "var(--glass-bg-heavy)", backdropFilter: "saturate(200%) blur(28px)", WebkitBackdropFilter: "saturate(200%) blur(28px)", borderBottom: "1px solid var(--glass-border)", boxShadow: "0 1px 0 rgba(0,0,0,0.06)"}}>
+    <div className="min-h-screen flex flex-col bg-background">
+      <header className="sticky top-0 z-40 safe-top" style={{background: "rgba(255,255,255,0.78)", backdropFilter: "saturate(200%) blur(28px)", WebkitBackdropFilter: "saturate(200%) blur(28px)", borderBottom: "1px solid rgba(255,255,255,0.9)", boxShadow: "0 4px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,1)"}}>
         <div className="container flex h-14 md:h-16 items-center justify-between gap-3">
           <Link to="/" aria-label="ПИНГ ТАБЛЕТ — на главную">
             <Wordmark />
@@ -303,7 +303,7 @@ function PingPongDock({
                     width: 50, height: 50,
                     background: "#e8572a",
                     marginTop: -20,
-                    border: "4px solid #0d0d0d",
+                    border: "4px solid rgba(255,255,255,0.78)",
                   }}
                 >
                   <it.icon className="h-[22px] w-[22px] text-white" strokeWidth={2} />
